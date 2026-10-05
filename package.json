@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "nodemailer": "^8.0.7",
-    "pg": "^8.13.3"
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "eslint": "^10.2.1",
