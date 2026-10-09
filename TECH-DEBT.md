@@ -117,6 +117,36 @@ Aktueller Stand nach Tag 12 (Performance & Optimierung).
 
 ---
 
+## P2 - Lokale Datenbank von nativer PostgreSQL auf Container umstellen
+
+**Dateien:** `.env.example`, `README.md`, künftig `docker/docker-compose.dev.yml`
+
+**Befund:**
+
+- Lokal läuft die Datenbank (`linkshort`, `linkshort-test`) in der nativen PostgreSQL 18 der
+  Workstation (Systemdienst, Socket `/var/run/postgresql`, `PGHOST=/var/run/postgresql`).
+- Die CI nutzt `postgres:16`, Produktion läuft auf Neon. Lokal ist es damit eine dritte Version.
+- Auf einem neuen Rechner müssen Rolle und Datenbanken von Hand angelegt werden.
+- Die anderen Dev2K-Projekte (Chaco Conecta, Workout, Kingdom) laufen lokal schon mit eigenem
+  Postgres-Container. Beschlossen am 2026-10-08: Chaco Conecta zieht auf Docker um (Spec 013 im
+  Projekt Chaco Conecta), danach soll dieses Projekt folgen.
+
+**Plan (später):**
+
+1. Entscheiden: Docker-Compose oder Podman (Konstantin will Podman langfristig, solange die
+   Workstation Docker nutzt, ist Docker der pragmatische Weg).
+2. Eigene Compose-Datei mit festem Projektnamen, festem Volume-Namen und einem freien Host-Port
+   (belegt: 5432 nativ, 5434 Workout, 5435 Chaco Conecta, 5436 Kingdom).
+3. Version an CI und Neon angleichen (Neon-Version prüfen).
+4. Dump von `linkshort` und `linkshort-test` mit dem `pg_dump` der Zielversion, einspielen, Zeilenzahlen
+   vergleichen.
+5. `.env.example` und `README.md` auf Host und Port umstellen, `PGHOST` nicht mehr auf den Socket.
+6. Native Datenbanken erst nach erfolgreicher Prüfung löschen. Danach kann die native PostgreSQL der
+   Workstation ganz entfernt werden, falls kein anderes Projekt sie braucht.
+7. Wiki-Seite `infra/geraete-container-datenbanken-ports` aktualisieren.
+
+---
+
 ## Notizen
 
 - `idx_link_clicks_code` bleibt sinnvoll für Point-Lookups (z. B. Referrer pro Code).
